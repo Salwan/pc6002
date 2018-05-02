@@ -4,15 +4,13 @@ PNG60 requires Python 2.7 (or 3 though I haven't tested it) and the Pillow libra
 
 To convert PNG to an N66 BASIC program on a cassette, simple drag the PNG and drop it over the batch file with the settings you want:
 
-|-----------------+-------+---------------------------+----------------|
-|				  | MODE  |	Pixels Doubled Vertically | RLE Compression|
-|-----------------+-------+---------------------------+----------------+
-| png2bas5		  | 5	  | No						  | No
-| png2bas5_doubler| 5	  | Yes						  | No
-| png2bas5_rle	  | 5	  | Yes						  | Yes
-| png2bas6		  | 6	  | No						  | No
-| png2bas6_rle	  | 6	  | No						  | Yes
-|----------------------------------------------------------------------|
+|                  | MODE | Pixels Doubled Vertically | RLE Compression |
+|------------------|------|---------------------------|-----------------|
+| png2bas5         | 5    | No                        | No              |
+| png2bas5_doubler | 5    | Yes                       | No              |
+| png2bas5_rle     | 5    | Yes                       | Yes             |
+| png2bas6         | 6    | No                        | No              |
+| png2bas6_rle     | 6    | No                        | Yes             |
 
 If using Mode 5 format, PAGE number must be set to 3 in the PC-6001.
 
