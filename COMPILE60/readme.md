@@ -1,5 +1,5 @@
-z88dk ZCC PC60 Compiler Front-end
-==================================
+z88dk ZCC PC-6002 Compiler Front-end
+=====================================
 
 This is a Tkinter Python-based UI front-end for z88dk ZCC compiler for PC-60 platform.
 
