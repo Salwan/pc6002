@@ -11,7 +11,7 @@ COMPILE60 requires the following to work:
 
 If everything is there, just double click `compile60.py` to start the front-end.
 
-![compile60 window](http://zenithsal.com/assets/pc6002/compile60_scrnshot_window.png)
+![compile60 window](http://zenithsal.com/assets/photos/pc6002/compile60_scrnshot_window.png)
 
 COMPILE60 will also generate a `.vscode` folder and tasks.json configuration file to build C code from within vscode. Use shortcut `Ctrl+Shift+B` and select the BASIC mode you would like to use to build the current open C file (this method cannot build multiple C files together, use the front-end for that).
 
