@@ -1,3 +1,6 @@
+PNG to N66-BASIC Importer
+===============================
+
 Usage: each internal command has a set of options
 
 PNG60 requires Python 2.7 (or 3 though I haven't tested it) and the Pillow library installed. For instructions, check the readme file in: requirements
