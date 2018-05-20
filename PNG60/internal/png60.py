@@ -129,7 +129,7 @@ def convert_color_to_byte_5(c, place):
 	maskL = 0b0011
 	assert(place >= 0 and place < 4)
 	c = c if c != 9 else 1
-	hc = c - 1 # 0b0000 to 0b1111 value
+	hc = max(c - 1, 0) # 0b0000 to 0b1111 value
 	pn = 3 - place # place is 0 1 2 3, flip it to match X shift
 	atr = ((hc & maskH) >> 2) << (pn * 2)
 	adr = (hc & maskL) << (pn * 2)
@@ -139,7 +139,7 @@ def convert_color_to_byte_5(c, place):
 # returns byte value
 def convert_color_to_byte_6(c, place):
 	c = c if c != 9 else 1
-	return ((c - 1) << (place * 4))
+	return (max(c - 1, 0) << (place * 4))
 
 # takes a block of 1 to 4 pixels (pads with zeros if < 4)
 # then generates the Mode 5 screen 3,2,2 byte for that block
