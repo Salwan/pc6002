@@ -37,6 +37,7 @@ STOPESCKEY	EQU		00132H	; STOP->Break, ESC->pause
 STOPKEYDOWN EQU		00135H	; CY=1 when stop is pressed
 STICKSTATE	EQU		00189H	; STICK(A=0-2) where 0 is keyboard, -> A=State
 TRIGSTATE	EQU		0018CH	; TRIG(A=0-2) where 0 is space -> Z=1 when pressed, 0 otherwise
+BEEP		EQU		00177H	; Make Beep sound
 M2YCOORDL	EQU		0CEH	; port low byte Y coord (0-255)
 M2YCOORDH	EQU		0CFH	; port high byte Y coord (256-319)
 
