@@ -34,12 +34,14 @@ if len(sys.argv) < 2:
 	print("Size limit applied: 256x200.")
 	print("First 2 bytes in files is the width/height of the bitmap.")
 	print(" Optional parameters: ")
-	print("  -d: doubles horizontal lines to produce a correct ratio image in mode 5 half resolution 3,2,2")
+	print("  -d: Mode 5 only. Doubles horizontal lines to produce a correct ratio image in mode 5 half resolution 3,2,2")
+	print("  -f: Mode 6 only. Generate topology for z80 SPRITE6LIB fast mode (Mode 6 Screen 2 pixel layout)")
 	exit();
 	
 image_file = ""
 mode_number = 5
 doubler = False
+fast_sprite_mode = False 
 
 c = 0
 for a in sys.argv:
@@ -59,10 +61,13 @@ for a in sys.argv:
 	elif s[0] == '-':
 		if s[1] == 'd':
 			doubler = True
+		elif s[1] == 'f':
+			fast_sprite_mode = True
 	else:
 		print("    Unknown " + s)
 
 assert(len(image_file) > 0 and (mode_number == 5 or mode_number == 6))
+assert(not (fast_sprite_mode and mode_number == 5)) # enabling fast mode for mode 5 is invalid
 
 # Convert palette to tuplelist
 p6rgb = []
@@ -169,12 +174,20 @@ if png:
 	print("    Format = " + str(png.format));
 	print("    Size   = " + str(png.size));
 	print("    Mode   = " + (png.mode));
+	if png.mode[0] == 'P':
+		print("Palette PNG, attempting to convert to RGB..")
+		try:
+			png = png.convert("RGB")
+		except:
+			raise NotImplementedError("This Palettized PNG is not supported. Please convert it to RGB or RGBA.")
 	if png.size[0] > 256 or png.size[1] > 200:
 		raise NotImplementedError("Size of given png exceeds P6 supported size 256x200, auto-scaling not implemented yet.")
 	if mode_number == 5 and png.size[0] % 4 != 0:
 		raise NotImplementedError("Width of given png doesn't match pixel blocks of 4 in mode 5. Auto padding will be implemented in the future.")
 	if mode_number == 6 and png.size[0] % 2 != 0:
 		raise NotImplementedError("Width of given png doesn't match pixel blocks of 2 in mode 6. Auto padding will be implemented in the future.")
+	if mode_number == 6 and fast_sprite_mode and (png.size[0] % 4 != 0 or png.size[1] % 2 != 0):
+		raise NotImplementedError("Width of given png doesn't match pixel blocks of 8 4x2 in mode 6 fast sprites. Auto padding will be implemented in the future.")
 	png_data = list(png.getdata())
 	print("Palette:")
 	print(str(p6rgb_p6color))
@@ -184,25 +197,64 @@ if png:
 	print("P6 BMP:")
 	#test_print(png.size[0])
 	# Generate hexadecimal
-	gc = [] # group colors
-	for p6c in p6_bmp:
-		gc.append(p6c)
-		if mode_number == 5:
-			if len(gc) >= 4:
-				process_color_byte_block_5(gc)
-				gc=[]
-		elif mode_number == 6:
-			if len(gc) >= 2:
-				process_color_byte_block_6(gc)
-				gc=[]
-		else:
-			raise NotImplementedError("Conversion: Invalid mode = " + str(mode_number))
+	if not fast_sprite_mode:
+		gc = [] # group colors
+		for p6c in p6_bmp:
+			gc.append(p6c)
+			if mode_number == 5:
+				if len(gc) >= 4:
+					process_color_byte_block_5(gc)
+					gc=[]
+			elif mode_number == 6:
+				if len(gc) >= 2:
+					process_color_byte_block_6(gc)
+					gc=[]
+			else:
+				raise NotImplementedError("Conversion: Invalid mode = " + str(mode_number))
+	else: # Mode 6 Fast Mode
+		assert(mode_number == 6)
+		# Fast sprite mode is for SPRITE6LIB for Mode 6 Screen 2 specifically
+		# It stores pixels following vram memory fast access mode
+		# Pixels are grouped into blocks of 8 (4x2) spanning two lines
+		# Zero padding will be added when necessary to align to 4x2 blocks
+		assert(png.size[0] % 4 == 0) # Fast mode requires blocks of 4 pixels
+		print("Number of pixels = " + str(len(p6_bmp)))
+		print("Generating fast sprite data for mode 6...")
+		#print("Pixels = " + str(p6_bmp))
+		for y in range(0, png.size[1], 2):
+			for x in range(0, png.size[0], 4):
+				# LINE 0: B0 B1
+				L0 = [0, 0, 0, 0]
+				L0[0] = p6_bmp[(y * png.size[0]) + x]
+				L0[1] = p6_bmp[(y * png.size[0]) + x + 1]
+				L0[2] = p6_bmp[(y * png.size[0]) + x + 2]
+				L0[3] = p6_bmp[(y * png.size[0]) + x + 3]
+				process_color_byte_block_6(L0[0:2])
+				process_color_byte_block_6(L0[2:4])
+				# LINE 1: B2 B3
+				L1 = [0, 0, 0, 0]
+				L1[0] = p6_bmp[((y + 1) * png.size[0]) + x]
+				L1[1] = p6_bmp[((y + 1) * png.size[0]) + x + 1]
+				L1[2] = p6_bmp[((y + 1) * png.size[0]) + x + 2]
+				L1[3] = p6_bmp[((y + 1) * png.size[0]) + x + 3]
+				process_color_byte_block_6(L1[0:2])
+				process_color_byte_block_6(L1[2:4])
+		#test_expected_out = [0x11, 0x22, 0x55, 0x66, 0x33, 0x44, 0x77, 0x99]
+		#print("Performing test...")
+		#test_pass = True
+		#if len(test_expected_out) != len(p6_hex_adr):
+		#	print("Failed size test: " + str(len(test_expected_out)) + " != " + str(len(p6_hex_adr)))
+		#	test_pass = False 
+		#else:
+		#	for i in range(0, len(test_expected_out)):
+		#		if test_expected_out[i] != p6_hex_adr[i]:
+		#			print("Failed value test: index " + str(i) + " " + str(test_expected_out[i]) + " != " + str(p6_hex_adr))
+		#			test_pass = False 
+		#print("Expected output: " + str(test_expected_out))
+		#print("Actual output: " + str(p6_hex_adr))
+		#print("Test Failed" if test_pass == False else "Test Passed!")
 	if mode_number == 5:
 		print("P6 Hex: " + str(len(p6_hex_atr)) + " byte pairs")
-		#print("ATR: ")
-		#test_print_p6_hex(p6_hex_atr,png.size[0])
-		#print("ADR: ")
-		#test_print_p6_hex(p6_hex_adr,png.size[0])
 		out_name = image_file[:-4]
 		adr_out_file = out_name + ".lo.p6bmp" 
 		atr_out_file = out_name + ".hi.p6bmp"
