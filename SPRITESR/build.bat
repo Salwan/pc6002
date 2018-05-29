@@ -1,13 +1,13 @@
 SET buildPath=build
 SET target=picard
-SET outPath=C:\Users\Salwa\ownCloud\PC60\disks
+SET outPath=.\build
 SET orgAddress=0x9000
 
 mkdir %buildPath%
 cd %buildPath%
 z80asm.exe --cpu=z80 -O=%buildPath% --output=%target% --make-bin --list ..\%target%.asm
 
-if exist %target%.bin (
+if exist %target% (
 	if exist %target%.d88 (
 		rem Disk exists
 	) else (

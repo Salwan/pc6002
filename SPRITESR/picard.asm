@@ -123,7 +123,8 @@ APP_VAR_PICARD_TX:		; Change these for motion
 	DEFB 50;128
 APP_VAR_PICARD_TY:
 	DEFB 50;188/2
-	
+
+; VRCCNT is counting 0-255 round-robin
 VSYNCEVENT:
 	; Runs 60 frames a second
 	PUSH AF

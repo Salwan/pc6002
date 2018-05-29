@@ -32,7 +32,7 @@ ENDVSYNCEVENT:
 	EI
 	RET
 	
-; Uset VRTC Routine
+; Use VRTC Routine
 USVRTC:
 	PUSH AF
 	LD A, (VRCCNT)
