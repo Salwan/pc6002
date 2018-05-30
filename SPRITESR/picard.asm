@@ -43,7 +43,7 @@ PICARD_VSYNC:
 	CALL SETVSYNCEVENT
 PICARD_INIT:
 						; Load up test sprite 1
-	LD HL, SDTest
+	LD HL, SDSprite8x64;SDTest
 	LD (SPRITESR_DATA0), HL
 	LD A, 0
 	LD (SPRITESR_DATA0+SprX), A
@@ -102,7 +102,7 @@ PICARD_UP:
 PICARD_DOWN:
 	LD HL, SPRITESR_DATA0+SprY
 	LD A, (HL)
-	ADD 76
+	ADD 255-187+64
 	JP C, PICARD_REDRAW
 	INC (HL)
 	JP PICARD_REDRAW
@@ -118,7 +118,7 @@ PICARD_END:
 	RET					;------------------- END
 BG_COLOR:
 	DEFB 0x55
-
+	
 ; VRCCNT is counting 0-255 round-robin
 VSYNCEVENT:
 	; Runs 60 frames a second
