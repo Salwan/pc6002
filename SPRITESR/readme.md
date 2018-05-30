@@ -95,6 +95,45 @@ void fastClearSprite(uint8 x, uint8 y, ptr* sprite, uint8 color) {
 	}
 }
 
+// bouncy 1-7 sprites
+
+SPRITE* sprites [7] = { ... };
+point8* spriteMove[7] = { ... };
+
+int B = 7;
+do {
+	uint8 mx = spriteMove[B].x;
+	if(mx > 0) {
+		// +X
+		if(sprites[B].x < 255 - 8) {
+			sprites[B].x += 1;
+		} else { // Flip movement
+			spriteMove[B].x = -1;
+		}
+	}
+	if(mx < 0) {
+		// -X
+		if(Sprites[B].x > 0) {
+			sprites[B].x -= 1;
+		} else {
+			spriteMove[B].x = 1;
+		}
+	}
+	uint8 my = spriteMove[B].y;
+	if(my > 0) {
+		if(sprites[B].y < 187 - 8) {
+			sprites[B].y += 1;
+		} else {
+			spriteMove[B].y = -1;
+		}
+		if(sprites[B].y > 0) {
+			sprites[B].y -= 1;
+		}  else {
+			spriteMove[B].y = 1;
+		}
+	}
+} while(B-- != 0)
+
 # Old Code Buffer
 
 OLDPICARD_UPDATE:
