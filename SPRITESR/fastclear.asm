@@ -121,7 +121,7 @@ CLEARSCREEN2RIGHT_END:
 ; FastClear memory
 ; HL = Start Address
 ; B = L Byte (255)
-; D = R Byte (255) -> max = 64KB clear
+; D = H Byte (255) -> max = 64KB clear
 ; C = Value to use
 FASTCLEAR:
 	DI

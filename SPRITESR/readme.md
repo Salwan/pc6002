@@ -12,6 +12,8 @@ Tiles: support for up to 32 16x16 different tiles (4KB) and any size. Tilemaps s
 
 # Pseudo Code
 
+~~~~~~ c
+
 // Sprite system
 
 uint8 spritesRedraw;// 1 bit per sprite for redraw
@@ -60,10 +62,6 @@ void redrawSprite(spirte8x8* spr) {
 	// Draw new sprite 
 	drawSprite(spr)'
 }
-
-// Tile system
-
-
 
 void fastDrawSprite(uint8 x, uint8 y, ptr* sprite) {
 	ptr* vram_addr = FASTSTARTADR + CoordsToAddr(x, y);
@@ -134,97 +132,4 @@ do {
 	}
 } while(B-- != 0)
 
-# Old Code Buffer
-
-OLDPICARD_UPDATE:
-						; Read Input
-	CALL MODKEYDOWN
-	JP Z, PICARD_UPDATE
-	LD B, A
-	LD HL, APP_VAR_PICARD_TX
-	LD DE, APP_VAR_PICARD_TY
-	AND 0b00010000		; Right
-	JP NZ, PICARD_RIGHT
-	LD A, B
-	AND 0b00100000		; Left
-	JP NZ, PICARD_LEFT
-	LD A, B
-	AND 0b00000100
-	JP NZ, PICARD_UP
-	LD A, B
-	AND 0b00001000
-	JP NZ, PICARD_DOWN
-	LD A, B
-	AND 0b10000000		; Space
-	JP NZ, PICARD_END
-	JP PICARD_UPDATE
-OLDPICARD_RIGHT:
-	INC (HL)
-	JP PICARD_UPDATE
-OLDPICARD_LEFT:
-	DEC (HL)
-	JP PICARD_UPDATE
-OLDPICARD_UP:
-	EX DE, HL
-	DEC (HL)
-	JP PICARD_UPDATE
-OLDPICARD_DOWN:
-	EX DE, HL
-	INC (HL)
-	JP PICARD_UPDATE
-OLDPICARD_END:
-	CALL ENDVSYNCEVENT
-						; Done
-	LD A, 000H
-	CALL SCREENPAGE		; Switch to Page 1
-	RET					;------------------- END
-	
-
-	
-APP_VAR_COUNT:
-	DEFB 0xff
-APP_VAR_PICARD_X:
-	DEFB 0
-APP_VAR_PICARD_Y:
-	DEFB 0
-APP_VAR_PICARD_TX:		; Change these for motion
-	DEFB 50;128
-APP_VAR_PICARD_TY:
-	DEFB 50;188/2
-	
-
-	LD A, (APP_VAR_PICARD_TX)
-	LD HL, APP_VAR_PICARD_X
-	CP (HL)
-	JP NZ, VSYNCEVENT_REDRAW
-	LD A, (APP_VAR_PICARD_TY)
-	LD HL, APP_VAR_PICARD_Y
-	CP (HL)
-	JP NZ, VSYNCEVENT_REDRAW
-	JP VSYNCEVENT_NOCHANGE
-VSYNCEVENT_REDRAW:
-						; Something changed! redraw
-	PUSH BC
-						; Clear sprite
-	LD HL, APP_VAR_PICARD_X
-	LD C, (HL)			; VAR_X
-	LD HL, APP_VAR_PICARD_Y
-	LD B, (HL)		
-	LD A, 0xff			; Clear color (2 pixels)
-	LD HL, SprSubzero
-	CALL FASTCLEARSPRITE
-						; Draw new sprite
-	LD HL, APP_VAR_PICARD_TX
-	LD C, (HL)
-	LD HL, APP_VAR_PICARD_TY
-	LD B, (HL)
-	LD HL, SprSubzero
-	CALL FASTDRAWSPRITE
-	LD HL, APP_VAR_PICARD_X
-	LD A, (APP_VAR_PICARD_TX)
-	LD (HL), A
-	LD HL, APP_VAR_PICARD_Y
-	LD A, (APP_VAR_PICARD_TY)
-	LD (HL), A
-	POP BC
-
+~~~
